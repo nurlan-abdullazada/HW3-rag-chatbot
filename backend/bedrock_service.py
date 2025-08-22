@@ -1,14 +1,16 @@
-import boto3
 import json
+
+import boto3
 from config import config
+
 
 class BedrockService:
     def __init__(self):
         self.bedrock_client = boto3.client(
-            'bedrock-runtime',
+            "bedrock-runtime",
             aws_access_key_id=config.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=config.AWS_SECRET_ACCESS_KEY,
-            region_name=config.AWS_REGION
+            region_name=config.AWS_REGION,
         )
         self.model_id = config.CLAUDE_MODEL_ID
 
@@ -28,39 +30,34 @@ class BedrockService:
 
     def _generate_claude_response(self, message: str) -> str:
         """Generate response using Claude model"""
-        prompt = f"""You are a helpful AI assistant for Azercell, Azerbaijan's leading mobile operator. 
-        
+        prompt = f"""You are a helpful AI assistant for Azercell, Azerbaijan's leading mobile operator.
+
         Here's some information about Azercell:
         - Azercell is Azerbaijan's first and largest mobile network operator
         - Founded in 1996, serving millions of customers
         - Offers 4G/5G mobile services, internet, and digital solutions
         - Known for innovation and quality network coverage
         - Headquarters in Baku, Azerbaijan
-        
+
         User question: {message}
-        
+
         Please provide a helpful response about Azercell services or general assistance."""
 
         body = {
             "anthropic_version": "bedrock-2023-05-31",
             "max_tokens": 1000,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
+            "messages": [{"role": "user", "content": prompt}],
         }
 
         response = self.bedrock_client.invoke_model(
             body=json.dumps(body),
             modelId=self.model_id,
-            accept='application/json',
-            contentType='application/json'
+            accept="application/json",
+            contentType="application/json",
         )
 
-        response_body = json.loads(response.get('body').read())
-        return response_body['content'][0]['text']
+        response_body = json.loads(response.get("body").read())
+        return response_body["content"][0]["text"]
 
     def _generate_titan_response(self, message: str) -> str:
         """Generate response using Amazon Titan model"""
@@ -83,19 +80,19 @@ Please provide a helpful response about Azercell services or general assistance:
                 "maxTokenCount": 1000,
                 "stopSequences": [],
                 "temperature": 0.7,
-                "topP": 0.9
-            }
+                "topP": 0.9,
+            },
         }
 
         response = self.bedrock_client.invoke_model(
             body=json.dumps(body),
             modelId=self.model_id,
-            accept='application/json',
-            contentType='application/json'
+            accept="application/json",
+            contentType="application/json",
         )
 
-        response_body = json.loads(response.get('body').read())
-        return response_body['results'][0]['outputText']
+        response_body = json.loads(response.get("body").read())
+        return response_body["results"][0]["outputText"]
 
     def health_check(self) -> bool:
         """Check if Bedrock service is accessible"""
