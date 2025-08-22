@@ -63,16 +63,16 @@ class BedrockService:
         """Generate response using Amazon Titan model"""
         prompt = f"""You are a helpful AI assistant for Azercell, Azerbaijan's leading mobile operator.
 
-Azercell Information:
-- Founded in 1996, Azerbaijan's first mobile operator
-- Serves millions of customers nationwide
-- Offers 4G/5G networks, mobile internet, digital solutions
-- Headquarters in Baku, Azerbaijan
-- Known for reliable coverage and innovation
+        Azercell Information:
+        - Founded in 1996, Azerbaijan's first mobile operator
+        - Serves millions of customers nationwide
+        - Offers 4G/5G networks, mobile internet, digital solutions
+        - Headquarters in Baku, Azerbaijan
+        - Known for reliable coverage and innovation
 
-User Question: {message}
+        User Question: {message}
 
-Please provide a helpful response about Azercell services or general assistance:"""
+        Please provide a helpful response about Azercell services or general assistance:"""
 
         body = {
             "inputText": prompt,
@@ -80,19 +80,19 @@ Please provide a helpful response about Azercell services or general assistance:
                 "maxTokenCount": 1000,
                 "stopSequences": [],
                 "temperature": 0.7,
-                "topP": 0.9,
-            },
+                "topP": 0.9
+            }
         }
 
         response = self.bedrock_client.invoke_model(
             body=json.dumps(body),
             modelId=self.model_id,
-            accept="application/json",
-            contentType="application/json",
+            accept='application/json',
+            contentType='application/json'
         )
 
-        response_body = json.loads(response.get("body").read())
-        return response_body["results"][0]["outputText"]
+        response_body = json.loads(response.get('body').read())
+        return response_body['results'][0]['outputText']
 
     def health_check(self) -> bool:
         """Check if Bedrock service is accessible"""

@@ -16,43 +16,179 @@ st.set_page_config(
 )
 
 # Custom CSS for better styling
-st.markdown(
-    """
+st.markdown("""
 <style>
+    /* Main app styling */
     .main-header {
         text-align: center;
-        color: #1f77b4;
-        font-size: 2.5rem;
+        color: #1e88e5;
+        font-size: 3rem;
         font-weight: bold;
         margin-bottom: 2rem;
+        background: linear-gradient(90deg, #1e88e5, #42a5f5);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
+    
+    /* Chat message containers */
     .chat-message {
-        padding: 1rem;
-        margin: 0.5rem 0;
-        border-radius: 10px;
+        padding: 1.2rem;
+        margin: 0.8rem 0;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        animation: slideIn 0.3s ease-in;
     }
+    
+    /* User message - Light Gray */
     .user-message {
-        background-color: #e3f2fd;
-        border-left: 4px solid #2196f3;
+        background: linear-gradient(135deg, #f5f5f5, #eeeeee);
+        border-left: 5px solid #616161;
+        margin-left: 2rem;
+        color: #424242;
     }
+    
+    /* Bot message - Azercell Blue */
     .bot-message {
-        background-color: #f1f8e9;
-        border-left: 4px solid #4caf50;
+        background: linear-gradient(135deg, #e1f5fe, #b3e5fc);
+        border-left: 5px solid #0277bd;
+        margin-right: 2rem;
+        color: #01579b;
     }
+    
+    /* Sidebar styling */
+    .css-1d391kg {
+        background: linear-gradient(180deg, #1e88e5, #1565c0);
+    }
+    
     .sidebar .sidebar-content {
-        background-color: #f8f9fa;
+        background: linear-gradient(180deg, #f8f9fa, #e9ecef);
+        border-radius: 10px;
+        padding: 1rem;
+    }
+    
+    /* Status indicators */
+    .status-online {
+        background: linear-gradient(90deg, #4caf50, #66bb6a);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        text-align: center;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(76,175,80,0.3);
+    }
+    
+    .status-offline {
+        background: linear-gradient(90deg, #f44336, #ef5350);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        text-align: center;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(244,67,54,0.3);
+    }
+    
+    /* Button styling */
+    .stButton > button {
+        background: linear-gradient(90deg, #1e88e5, #1976d2);
+        color: white;
+        border-radius: 25px;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(30,136,229,0.3);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(30,136,229,0.4);
+    }
+    
+    /* Input styling */
+    .stTextInput > div > div > input {
+        border-radius: 25px;
+        border: 2px solid #e0e0e0;
+        padding: 0.8rem 1.2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #1e88e5;
+        box-shadow: 0 0 10px rgba(30,136,229,0.2);
+    }
+    
+    /* Company info cards */
+    .info-card {
+        background: linear-gradient(135deg, #ffffff, #f8f9fa);
+        padding: 1.5rem;
+        border-radius: 15px;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin: 1rem 0;
+    }
+    
+    /* Animation for messages */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    /* Error message styling */
+    .error-message {
+        background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+        border-left: 5px solid #ff9800;
+        padding: 1rem;
+        border-radius: 10px;
+        margin: 1rem 0;
+    }
+    
+    /* Success message styling */
+    .success-message {
+        background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+        border-left: 5px solid #4caf50;
+        padding: 1rem;
+        border-radius: 10px;
+        margin: 1rem 0;
+    }
+    
+    /* Loading animation */
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #1e88e5;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 </style>
-""",
-    unsafe_allow_html=True,
-)
+""", unsafe_allow_html=True)
 
 
 def check_backend_health():
     """Check if backend is available"""
     try:
-        response = requests.get(f"{BACKEND_URL}/health", timeout=5)
+        response = requests.get(f"{BACKEND_URL}/health", timeout=10)  # Increased timeout
         return response.status_code == 200
+    except requests.exceptions.RequestException:
+        # Try alternative check
+        try:
+            response = requests.get(f"{BACKEND_URL}/", timeout=5)
+            return response.status_code == 200
+        except:
+            return False
     except Exception:
         return False
 
@@ -100,8 +236,11 @@ def main():
         🏢 **Azercell Telecom LLC** is Azerbaijan's first and largest mobile network operator.
 
         📅 **Founded:** 1996
+        
         📍 **Headquarters:** Baku, Azerbaijan
+        
         👥 **Customers:** Millions served nationwide
+        
         🌐 **Services:** 4G/5G, Mobile Internet, Digital Solutions
         """
         )
@@ -147,27 +286,21 @@ def main():
         # Display chat messages
         for message in st.session_state.messages:
             timestamp = message["timestamp"].strftime("%H:%M")
-
+            
             if message["role"] == "user":
-                st.markdown(
-                    f"""
+                st.markdown(f'''
                 <div class="chat-message user-message">
                     <strong>🧑‍💻 You ({timestamp}):</strong><br>
                     {message["content"]}
                 </div>
-                """,
-                    unsafe_allow_html=True,
-                )
+                ''', unsafe_allow_html=True)
             else:
-                st.markdown(
-                    f"""
+                st.markdown(f'''
                 <div class="chat-message bot-message">
                     <strong>🤖 Azercell AI ({timestamp}):</strong><br>
                     {message["content"]}
                 </div>
-                """,
-                    unsafe_allow_html=True,
-                )
+                ''', unsafe_allow_html=True)
 
         # Handle example query from sidebar
         if "example_query" in st.session_state:
